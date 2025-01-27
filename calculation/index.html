@@ -30,7 +30,7 @@
 			align-items: center;
 		}
 		.question_text{
-			font-size: 10vmin;
+			font-size: 7vmin;
 			font-weight: bold;
 		}
 		.hidden{
@@ -168,6 +168,7 @@
 				this.nowQuestion=1;
 
 				document.getElementById("contents_board_parent").classList.add("hidden");
+				document.getElementById("score_board_parent").classList.add("hidden");
 				document.getElementById("question_board").classList.remove("hidden");
 
 				document.getElementById("answer_input").focus();
@@ -185,6 +186,7 @@
 				},1000)
 			}
 			stop(){
+				this.started=false;
 				document.getElementById("question_board").classList.add("hidden");
 				document.getElementById("score_board_parent").classList.remove("hidden");
 
