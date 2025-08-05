@@ -157,21 +157,6 @@
 		</div>
 	</div>
 	<script>
-		let input=document.getElementById("answer_input")
-		input.addEventListener("keyup",(event)=>{
-			if (event.key === 'Enter' || event.keyCode===32) {
-				param.compare()
-				
-			}
-
-		})
-		input.addEventListener("focus",(event)=>{
-			setTimeout(() => {
-				let input=document.body
-				input.scrollIntoView({ behavior: 'smooth', block: 'end' });
-			  }, 150);
-		})
-
 		function resizeCanvasToDisplaySize(canvas) {
 			const displayWidth = canvas.clientWidth;
 			const displayHeight = canvas.clientHeight;
@@ -190,8 +175,12 @@
 		function drawRandomCircles() {
 			resizeCanvasToDisplaySize(canvas)
 			param.questionCount++;
-			const minRadius = 40;
-			const maxRadius = 50;
+			
+			const shortSide = Math.min(canvas.clientWidth, canvas.clientHeight);
+
+			const minRadius = shortSide * 0.07;
+			const maxRadius = shortSide * 0.1;
+
 			const numberOfCircles = Math.floor(Math.random() *( param.maxCount-param.minCount+1)) + param.minCount; // 5~15개
 			
 			ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight); // 이전 원 지우기
@@ -235,6 +224,18 @@
 		window.addEventListener("load",()=>{
 			//drawRandomCircles()
 			param=new QuestionParam();
+			let input=document.getElementById("answer_input")
+			input.addEventListener("keyup",(event)=>{
+				if (event.key === 'Enter' || event.keyCode===32) {
+					param.compare();
+				}
+			})
+			input.addEventListener("focus",(event)=>{
+				setTimeout(() => {
+					let input=document.body
+					input.scrollIntoView({ behavior: 'smooth', block: 'end' });
+				}, 150);
+			})
 		})
 	</script>
   </body>
