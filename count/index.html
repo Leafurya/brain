@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숫자 세기</title>
+    <link href="../aistyle.css" rel="stylesheet">
+	<style>
+		canvas{
+			width:100%;
+		}
+	</style>
+	<script src="../global.js"></script>
+	<script>
+		class QuestionParam extends SettingBase{
+			constructor(){
+				super()
+				this.minCount=5;
+				this.maxCount=15;
+				this.minSize=40;
+				this.maxSize=50;
+				this.timeout=10000;//5초
+				this.randomColor=false;
+				this.timeoutHandler=null;
+				this.circleCount=null;
+				this.correct=0;
+				this.questionCount=0;
+			}
+			
+			setParam(minCount,maxCount,timeout,randomColor){
+				this.minCount=minCount;
+				this.maxCount=maxCount;
+				this.timeout=timeout;
+				this.randomColor=randomColor;
+			}
+			compare(){
+				let result=parseInt(document.getElementById("answer_input").value)
+				
+				if(this.timeoutHandler){
+					clearTimeout(this.timeoutHandler);
+				}
+				
+				if(result==this.circleCount){
+					this.onCorrect();
+					this.correct++;
+				}
+				else{
+					this.onIncorrect();
+				}
+				document.getElementById("answer_input").value="";
+				drawRandomCircles();
+			}
+			stop(){
+				super.stop();
+				if(this.timeoutHandler){
+					clearTimeout(this.timeoutHandler);
+					ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+				}
+				this.showStat();
+			}
+			showStat(){
+				super.end(`맞힌 문제: ${this.correct}  / ${this.questionCount}`);
+			}
+			start(){
+				super.init();
+				let time=3;
+				super.showCount(time);
+				let hInterval=setInterval(()=>{
+					time--;
+					if(time<1){
+						clearInterval(hInterval)
+						super.start();
+						drawRandomCircles();
+						return;
+					}
+					super.showCount(time);
+				},1000)
+			}
+		}
+		let param;
+		function getFormData(){
+			let formData=new FormData(document.getElementById("setting_data"));
+			let minCount=5;
+			let maxCount=15;
+
+			let range=formData.get("count_range").split("~");
+
+			param.setParam(parseInt(range[0]),parseInt(range[1]),parseInt(formData.get("timeout"))*1000,formData.get("random_color")?true:false);
+			param.start();
+			
+		}
+	</script>
+  </head>
+  <body class="container">
+	<div id="webcrumbs">
+		<div>
+			<a href="../index.html">홈으로</a>
+		</div>
+		<div class="w-[1200px] min-h-[800px] bg-white shadow rounded-lg flex">
+			<aside class="w-[300px] bg-neutral-100 p-6">
+				<h2 class="text-xl font-title text-neutral-950 mb-4">Question Settings</h2>
+				<form class="space-y-4" id="setting_data" method="post">
+					<div>
+						<label for="category" class="block text-neutral-800 mb-2">개수 범위</label>
+						<select id="category" name="count_range"
+							class="w-full border border-neutral-300 rounded-md p-2 bg-white text-neutral-950">
+							<option value="5~15">5~15</option>
+							<option value="5~20">5~20</option>
+							<option value="10~25">10~25</option>
+							<option value="10~30">10~30</option>
+						</select>
+					</div>
+					<div>
+						<label for="timeLimit" class="block text-neutral-800 mb-2">타임아웃</label>
+						<input type="number" name="timeout"
+						id="timeLimit" class="w-full border border-neutral-300 rounded-md p-2 bg-white text-neutral-950"
+						placeholder="문제 수" value="10"/>
+					</div>
+					<div>
+						<label>
+							무작위 색상 <input type="checkbox" name="random_color" id="random_color" class="border border-neutral-300 rounded-md p-2 bg-white text-neutral-950">
+						</label>
+					</div>
+				</form>
+				<button class="bg-primary-500 text-primary-50 rounded-md px-4 py-2 w-full mt-4" onclick="getFormData();">설정 적용</button>
+			</aside>
+			<main class="flex-1 bg-neutral-50 p-6 flex_vertical">
+				<div class="flex-1 flex_vertical">
+					<h2 class="text-2xl font-title text-neutral-950 mb-4">Question</h2>
+					<div class="flex_vertical flex_grow_1 question_text vertical_center horizontal_center " id="game_board">
+						<canvas id="question_board"  class="hidden"></canvas>
+						<span class="text-2xl hidden" id="score_board_parent">
+							<div id="score_board">
+
+							</div>
+							설정 적용 시 시작
+						</span>
+						<span class="text-2xl" id="contents_board_parent">
+							<div id="contents_board">
+								설정 적용 시 시작
+							</div>
+						</span>
+					</div>
+				</div>
+				<div class="flex-1">
+					<h2 class="text-2xl font-title text-neutral-950 mb-4">Answer</h2>
+					<div>
+						<input type="number"
+						id="answer_input"
+						class="w-full border border-neutral-300 rounded-md p-2 bg-white text-neutral-950"
+						placeholder="Type answer option"/>
+						<button class="bg-primary-500 text-primary-50 rounded-md px-4 py-2 w-full mt-4" onclick="">확인 <span style="color:rgb(172, 172, 172)">(스페이스, 엔터)</span></button>
+						<button class="bg-primary-500 text-primary-50 rounded-md px-4 py-2 w-full mt-4" onclick="param.stop()">종료 <span style="color:rgb(172, 172, 172)"></span></button>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script>
+		let input=document.getElementById("answer_input")
+		input.addEventListener("keyup",(event)=>{
+			if (event.key === 'Enter' || event.keyCode===32) {
+				param.compare()
+				
+			}
+
+		})
+		input.addEventListener("focus",(event)=>{
+			setTimeout(() => {
+				let input=document.body
+				input.scrollIntoView({ behavior: 'smooth', block: 'end' });
+			  }, 150);
+		})
+
+		function resizeCanvasToDisplaySize(canvas) {
+			const displayWidth = canvas.clientWidth;
+			const displayHeight = canvas.clientHeight;
+			const needResize = canvas.width !== displayWidth || canvas.height !== displayHeight;
+			if (needResize) {
+				canvas.width = displayWidth;
+				canvas.height = displayHeight;
+			}
+			return needResize;
+		}
+
+		const canvas = document.getElementById("question_board");
+		const ctx = canvas.getContext("2d");
+		let circleCount = 0;
+
+		function drawRandomCircles() {
+			resizeCanvasToDisplaySize(canvas)
+			param.questionCount++;
+			const minRadius = 40;
+			const maxRadius = 50;
+			const numberOfCircles = Math.floor(Math.random() *( param.maxCount-param.minCount+1)) + param.minCount; // 5~15개
+			
+			ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight); // 이전 원 지우기
+			circleCount = numberOfCircles;
+
+			for (let i = 0; i < numberOfCircles; i++) {
+				const radius = Math.random() * (maxRadius - minRadius) + minRadius;
+				const x = Math.random() * (canvas.clientWidth - 2 * radius) + radius;
+				const y = Math.random() * (canvas.clientHeight - 2 * radius) + radius;
+				ctx.beginPath();
+				ctx.arc(x, y, radius, 0, 2 * Math.PI);
+				ctx.fillStyle = getRandomColor();
+				ctx.fill();
+				ctx.closePath();
+			}
+			param.circleCount=circleCount;
+
+			param.timeoutHandler=setTimeout(()=>{
+				param.onIncorrect();
+				drawRandomCircles();
+
+			},param.timeout);
+		}
+
+		function getRandomColor() {
+			let r
+			let g
+			let b
+			if(param.randomColor){
+				r = Math.floor(Math.random() * 256);
+				g = Math.floor(Math.random() * 256);
+				b = Math.floor(Math.random() * 256);
+			}
+			else{
+				r = 0;
+				g = 0;
+				b = 0;
+			}
+			return `rgba(${r}, ${g}, ${b}, 0.7)`;
+		}
+		window.addEventListener("load",()=>{
+			//drawRandomCircles()
+			param=new QuestionParam();
+		})
+	</script>
+  </body>
+</html>

@@ -4,223 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>암산 연습기</title>
-    <link href="./aistyle.css" rel="stylesheet">
-	<style>
-		.flex_vertical{
-			display: flex;
-			flex-direction: column;
-		}
-		.flex_horizontal{
-			display: flex;
-			flex-direction: row;
-		}
-		.flex1{
-			flex:1;
-		}
-		.setting{
-			background-color: antiquewhite;
-		}
-		.flex_grow_1{
-			flex-grow: 1;
-		}
-		.horizontal_center{
-			justify-content: center;
-		}
-		.vertical_center{
-			align-items: center;
-		}
-		.question_text{
-			font-size: 7vmin;
-			font-weight: bold;
-		}
-		.hidden{
-			display:none;
-		}
-		.input_wrapper {
-			position: fixed;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			padding: 10px;
-			background-color: #fff;
-		  }
-		
-		
-		
-		@media (max-width: 800px) {
-			#webcrumbs .flex {
-				display: flex;
-				flex-direction: column;
-			}
-			#webcrumbs .w-\[300px\] {
-				/* width: 300px; */
-				width: 100vmin;
-			}
-			.question_text{
-				font-size: 7vh;
-				font-weight: bold;
-			}
-			body {
-				line-height: inherit;
-				padding: 0;
-				display: flex;
-				flex-direction: column;
-				width:100%;
-				height:auto;
-				/* min-width: 100vw;
-				min-height: 100vh; */
-				align-items: center;
-				justify-content: center;
-				background: linear-gradient(135deg, #ffffff, #d4d4d4);
-			}
-		}
-	</style>
-	<script>
-		function rand(min, max) {
-			return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
-		class Question{
-			constructor(){
-				this.types=["+","-","x"];
-				this.type=0;
-				this.max=10;
-				this.limit=true;
-				this.qcount=50;
-				this.a=0;
-				this.b=0;
-
-				this.tType;
-				this.right=0;
-				this.nowQuestion=1;
-				this.started=false;
-			}
-			setSetting(type,max,limit,qcount){
-				if(this.started){
-					this.stop();
-				}
-				this.type=parseInt(type);
-				this.max=parseInt(max);
-				this.limit=(limit==="limit");
-				this.qcount=parseInt(qcount);
-				this.right=0;
-			}
-			make(){
-				if(this.limit){
-					if(this.nowQuestion>this.qcount){
-						this.stop();
-						return "끝";
-					}
-				}
-				this.nowQuestion++;
-				this.a=rand(1,this.max)
-				this.b=rand(1,this.max)
-
-				let simbol;
-				if(this.type==3){
-					this.tType=rand(0,2);
-					simbol=this.types[this.tType];
-				}
-				else{
-					this.tType=this.type;
-					simbol=this.types[this.tType];
-				}
-
-				return this.a+" "+simbol+" "+this.b;
-			}
-			show(question){
-				document.getElementById("question_board").innerHTML=question;
-			}
-			compare(){
-				let result=parseInt(document.getElementById("answer_input").value)
-				console.log(result);
-				switch(this.tType){
-					case 0:
-						if((this.a+this.b)===result){
-							this.right++;
-						}
-						break;
-					case 1:
-						if((this.a-this.b)===result){
-							this.right++;
-						}
-						break;
-					case 2:
-						if((this.a*this.b)===result){
-							this.right++;
-						}
-						break;
-				}
-				document.getElementById("answer_input").value="";
-				this.show(this.make())
-			}
-			getSetting(){
-				let types=["덧셈","뺄셈","곱셈","혼합"]
-				let result="문제 유형: "+types[this.type]+"<br>";
-				result+="숫자 범위: 1 ~ "+this.max+"<br>";
-				result+="문제 개수: "+(this.limit?this.qcount+" 개":"무한")+"<br>";
-				
-				return result;
-			}
-			start(){
-				this.started=true;
-				this.tType=0;
-				this.right=0;
-				this.nowQuestion=1;
-
-				document.getElementById("contents_board_parent").classList.add("hidden");
-				document.getElementById("score_board_parent").classList.add("hidden");
-				document.getElementById("question_board").classList.remove("hidden");
-
-				document.getElementById("answer_input").focus();
-	
-				let time=3;
-				this.show(time)
-				let hInterval=setInterval(()=>{
-					time--;
-					if(time<1){
-						clearInterval(hInterval)
-						this.show(this.make())
-						return;
-					}
-					this.show(time);
-				},1000)
-			}
-			stop(){
-				this.started=false;
-				document.getElementById("question_board").classList.add("hidden");
-				document.getElementById("score_board_parent").classList.remove("hidden");
-
-				this.showStat();
-			}
-			confirm(){
-				document.getElementById("score_board_parent").classList.add("hidden");
-				document.getElementById("contents_board_parent").classList.remove("hidden");
-
-				printContents(this.getSetting());
-			}
-			showStat(){
-				document.getElementById("score_board").innerHTML="맞힌 문제: "+this.right+" / "+(this.nowQuestion-1);
-			}
-		}
-		function getFormData(){
-			let formData=new FormData(document.getElementById("setting_data"));
-			console.log(formData.get("type"));
-			console.log(formData.get("number"));
-			console.log(formData.get("mode"));
-			console.log(formData.get("qcount"));
-
-			question.setSetting(formData.get("type"),formData.get("number"),formData.get("mode"),formData.get("qcount"));
-			printContents(question.getSetting())
-		}
-		function printContents(str){
-			document.getElementById("contents_board").innerHTML=str
-		}
-		let question=new Question();
-
+    <link href="../aistyle.css" rel="stylesheet">
+	<script src="../global.js"></script>
+	<script src="./script.js">
 	</script>
   </head>
   <body class="container">
 	<div id="webcrumbs">
+		<div>
+			<a href="../index.html">홈으로</a>
+		</div>
 		<div class="w-[1200px] min-h-[800px] bg-white shadow rounded-lg flex">
 			<aside class="w-[300px] bg-neutral-100 p-6">
 				<h2 class="text-xl font-title text-neutral-950 mb-4">Question Settings</h2>
@@ -259,19 +52,20 @@
 			<main class="flex-1 bg-neutral-50 p-6 flex_vertical">
 				<div class="flex-1 flex_vertical">
 					<h2 class="text-2xl font-title text-neutral-950 mb-4">Question</h2>
-					<div class="flex_vertical flex_grow_1 question_text vertical_center horizontal_center">
+					<div class="flex_vertical flex_grow_1 question_text vertical_center horizontal_center" id="game_board">
 						<span id="question_board" class="hidden">
 							
 						</span>
 						<span class="text-2xl hidden" id="score_board_parent">
 							<div id="score_board">
 							</div>
-							<button class="bg-primary-500 text-primary-50 rounded-md px-4 py-2 w-full mt-4" onclick="question.confirm()">확인</button>
+							설정 적용 시 시작
 						</span>
 						<span class="text-2xl" id="contents_board_parent">
 							<div id="contents_board">
+								설정 적용 시 시작
 							</div>
-							<button class="bg-primary-500 text-primary-50 rounded-md px-4 py-2 w-full mt-4" onclick="question.start()">시작</button>
+							<!-- <button class="bg-primary-500 text-primary-50 rounded-md px-4 py-2 w-full mt-4" onclick="question.start()">시작</button> -->
 						</span>
 					</div>
 				</div>
@@ -289,7 +83,7 @@
 		</div>
 	</div>
 	<script>
-		printContents(question.getSetting());
+		//printContents(question.getSetting());
 		let input=document.getElementById("answer_input")
 		input.addEventListener("keyup",(event)=>{
 			if(event.keyCode===32){
