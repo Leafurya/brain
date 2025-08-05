@@ -57,12 +57,15 @@
 					ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 				}
 				this.showStat();
+				
 			}
 			showStat(){
 				super.end(`맞힌 문제: ${this.correct}  / ${this.questionCount}`);
 			}
 			start(){
 				super.init();
+				this.correct=0;
+				this.questionCount=0;
 				let time=3;
 				super.showCount(time);
 				let hInterval=setInterval(()=>{
